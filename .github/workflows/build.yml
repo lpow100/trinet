@@ -11,7 +11,7 @@ jobs:
 
       - name: Compile Trinet (Windows)
         run: |
-          gcc -c windows.c -o windows.o -I. -lws2_32
+          gcc -c src/windows.c -o src/windows.o -I. -lws2_32
           echo "Windows compilation successful!"
 
   build-linux:
@@ -22,5 +22,5 @@ jobs:
 
       - name: Compile Trinet (Linux)
         run: |
-          gcc -c linux.c -o linux.o -I.
+          gcc -c src/linux.c -o src/linux.o -I.
           echo "Linux compilation successful!"
