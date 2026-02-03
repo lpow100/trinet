@@ -1,27 +1,35 @@
 #include <trinet.h>
-#include <netdb.h>
-#include <arpa/inet.h>
+#include <winsock2.h>
 
 void init(int flags) {
     if ((flags & QUIET_LOGS) != 0) quietLogs = false;
+
+    WSADATA wsadata;
+
+    int initWSA = WSAStartup(MAKEWORD(2, 2), &wsadata);
+    if (initWSA != 0) {
+        printf("WSA failed to initialize %d\n", WSAGetLastError());
+        WSACleanup();
+        return;
+    }
 }
-void cleanup() { /*Fuck windows api*/ }
+void cleanup() { WSACleanup(); }
 
 struct Socket CreateServerSocket(Protocol protocol, int port, int backlogLength) {
     struct Socket output = { (void*)(intptr_t)-1, protocol};
-    int sockfd;
+    SOCKET sockfd;
     struct sockaddr_in serv_addr;
 
     sockfd = socket(AF_INET /*IPv4 domain*/, SOCK_STREAM, 0);
-    if (sockfd < 0) {
+    if (sockfd == INVALID_SOCKET) {
         Log(LOG_ERROR, "Couldn't create server socket", "Error in socket initalization");
         return output;
     }
 
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_addr.S_un.S_addr = INADDR_ANY;
     serv_addr.sin_port = htons(port);
-    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == SOCKET_ERROR) {
         Log(LOG_ERROR, "Couldn't create server socket", "Error in socket binding");
         return output;
     }
@@ -34,15 +42,15 @@ struct Socket CreateServerSocket(Protocol protocol, int port, int backlogLength)
 
 struct Socket AcceptClient(struct Socket server) {
     struct Socket output = { (void*)(intptr_t)-1, server.protocol};
-    int clientSockfd;
-    socklen_t clilen;
+    SOCKET clientSockfd;
+    int clilen;
     struct sockaddr_in cli_addr;
 
     clilen = sizeof(cli_addr);
     clientSockfd = accept((int)server.instance, 
                 (struct sockaddr *) &cli_addr, 
                 &clilen);
-    if (clientSockfd < 0) {
+    if (clientSockfd == INVALID_SOCKET) {
         Log(LOG_ERROR, "Couldn't create client connection socket", "Error in socket acception");
         return output;
     }
@@ -53,7 +61,7 @@ struct Socket AcceptClient(struct Socket server) {
 
 struct Socket CreateClientSocket(Protocol protocol, struct Address addr) {
     struct Socket output = { (void*)(intptr_t)-1, protocol};
-    int sockfd;
+    SOCKET sockfd;
     struct sockaddr_in serv_addr;
 
     sockfd = socket(AF_INET /*IPv4 domain*/, SOCK_STREAM, 0);
@@ -63,7 +71,7 @@ struct Socket CreateClientSocket(Protocol protocol, struct Address addr) {
     }
 
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = addr.ip;
+    serv_addr.sin_addr.S_un.S_addr = addr.ip;
     serv_addr.sin_port = htons(addr.port);
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
         Log(LOG_ERROR, "Couldn't connect to server", "Error in socket connection");
@@ -74,9 +82,9 @@ struct Socket CreateClientSocket(Protocol protocol, struct Address addr) {
     return output;
 }
 
-int SocketSend(struct Socket sock, const char *data, int length) { return write((int)sock.instance,data,length); }
-int SocketRecv(struct Socket sock, char* buffer, int maxLength) { return recv((int)sock.instance,buffer,maxLength,0); }
-void CloseSocket(struct Socket sock) { close((int)sock.instance); }
+int SocketSend(struct Socket sock, const char *data, int length) { return send((SOCKET)sock.instance,data,length, 0); }
+int SocketRecv(struct Socket sock, char* buffer, int maxLength) { return recv((SOCKET)sock.instance,buffer,maxLength,0); }
+void CloseSocket(struct Socket sock) { closesocket((SOCKET)sock.instance); }
 
 struct Address GetHostnameAddr(const char* hostname, int port) {
     struct Address output = {-1, -1}; 

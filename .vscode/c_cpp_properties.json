@@ -10,6 +10,19 @@
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64",
             "compilerPath": "/usr/bin/gcc"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/x86_64-w64-mingw32/include" 
+            ],
+            "defines": [
+                "_WIN32",
+                "UNICODE"
+            ],
+            "compilerPath": "/usr/bin/x86_64-w64-mingw32-gcc",
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

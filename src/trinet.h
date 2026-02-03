@@ -3,24 +3,29 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <stdarg.h> 
 #include <unistd.h>
+#include <stdbool.h>
 
-struct Socket {
-    void *instance;
-    Protocol protocol;
-};
+#define QUIET_LOGS 0b1
+
+void init(int flags);
+void cleanup();
+
+extern bool quietLogs;
 
 typedef enum {
     NET_TCP,
     NET_UDP
 } Protocol;
 
+struct Socket {
+    void *instance;
+    Protocol protocol;
+};
+
 struct Address {
-    const char *ip;
+    int ip;
     int port;
 };
 
@@ -35,7 +40,8 @@ struct Socket AcceptClient(struct Socket server);
 int SocketSend(struct Socket sock, const char *data, int length);
 int SocketRecv(struct Socket sock, char* buffer, int maxLength);
 void CloseSocket(struct Socket sock);
-
+struct Address GetHostnameAddr(const char* hostname, int port);
+struct Address GetIpAddr(const char* ip, int port);
 
 typedef enum {
     LOG_INFO,

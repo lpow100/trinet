@@ -1,0 +1,26 @@
+name: Cross-Platform Build Test
+
+on: [push, pull_request]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile Trinet (Windows)
+        run: |
+          gcc -c windows.c -o windows.o -I. -lws2_32
+          echo "Windows compilation successful!"
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile Trinet (Linux)
+        run: |
+          gcc -c linux.c -o linux.o -I.
+          echo "Linux compilation successful!"

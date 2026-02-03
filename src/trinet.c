@@ -5,3 +5,5 @@
 #else
     #error "Platform trinet!"
 #endif
+
+#include "common.c"
