@@ -1,4 +1,4 @@
-#include <trinet.h>
+#include "trinet.h"
 #include <winsock2.h>
 
 void init(int flags) {
