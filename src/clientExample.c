@@ -9,6 +9,8 @@ int main(int argc, char** argv){
         return -1;
     }
 
+    init(0);
+
     struct Address addr = GetIpAddr(argv[1],atoi(argv[2]));
     if (addr.ip == -1) {
         Log(LOG_ERROR,"Incorrect Arguments", "Bad hostname");
@@ -24,4 +26,6 @@ int main(int argc, char** argv){
     printf(buf);
 
     CloseSocket(sock);
+
+    cleanup();
 }

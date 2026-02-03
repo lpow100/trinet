@@ -1,4 +1,4 @@
-#include <trinet.h>
+#include "trinet.h"
 #include <stdbool.h>
 
 bool quietLogs = false;

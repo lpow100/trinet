@@ -47,7 +47,7 @@ struct Socket AcceptClient(struct Socket server) {
     struct sockaddr_in cli_addr;
 
     clilen = sizeof(cli_addr);
-    clientSockfd = accept((int)server.instance, 
+    clientSockfd = accept((SOCKET)server.instance, 
                 (struct sockaddr *) &cli_addr, 
                 &clilen);
     if (clientSockfd == INVALID_SOCKET) {

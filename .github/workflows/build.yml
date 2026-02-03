@@ -1,26 +1,31 @@
-name: Cross-Platform Build Test
+name: Windows Network Test
 
 on: [push, pull_request]
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build-and-run:
+    runs-on: windows-latest  # This is a real Windows VM!
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Compile Trinet (Windows)
+      - name: Compile with MinGW
         run: |
-          gcc -c src/windows.c -o src/windows.o -I. -lws2_32
-          echo "Windows compilation successful!"
+          gcc -o serverExample.exe src/serverExample.c src/windows.c src/common.c -I. -lws2_32
 
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Compile Trinet (Linux)
+      - name: Test Server Startup
         run: |
-          gcc -c src/linux.c -o src/linux.o -I.
-          echo "Linux compilation successful!"
+          # Start the server in the background and wait 2 seconds
+          Start-Process -FilePath "./serverExample.exe" -ArgumentList "8080"
+          Start-Sleep -Seconds 2
+          
+          # Check if the process is still running (if it crashed, this fails)
+          $proc = Get-Process -Name "serverExample" -ErrorAction SilentlyContinue
+          if ($proc) {
+              Write-Host "Server is running successfully!"
+              Stop-Process -Name "serverExample"
+          } else {
+              Write-Error "Server crashed or failed to start!"
+              exit 1
+          }

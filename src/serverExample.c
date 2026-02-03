@@ -4,9 +4,12 @@
 #include <string.h>
 
 int main(int argc, char** argv){
+    printf("Hi!\n`");
     if (argc != 2) {
         Log(LOG_ERROR,"Incorrect Arguments", "Please use trinet {port}");
     }
+
+    init(0);
 
     struct Socket sock = CreateServerSocket(NET_TCP, atoi(argv[1]), 5);
 
@@ -21,4 +24,6 @@ int main(int argc, char** argv){
 
     CloseSocket(sock);
     CloseSocket(client);
+
+    cleanup();
 }
