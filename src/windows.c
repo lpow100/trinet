@@ -20,7 +20,7 @@ struct Socket CreateServerSocket(Protocol protocol, int port, int backlogLength)
     SOCKET sockfd;
     struct sockaddr_in serv_addr;
 
-    sockfd = socket(AF_INET /*IPv4 domain*/, SOCK_STREAM, 0);
+    sockfd = socket(AF_INET /*IPv4 domain*/, SOCK_STREAM, IPPROTO_TCP);
     if (sockfd == INVALID_SOCKET) {
         Log(LOG_ERROR, "Couldn't create server socket", "Error in socket initalization");
         return output;
